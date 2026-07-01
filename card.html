@@ -1,0 +1,141 @@
+<style>
+  .scena {
+    width: 100%;
+    height: calc(100vh - 250px);
+    background: #08283e;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card {
+    position: absolute;
+    width: 280px;
+    height: 380px;
+    border-radius: 6px;
+    overflow: hidden;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.4s ease, opacity 0.4s ease, z-index 0.4s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none; 
+  }
+</style>
+
+
+<script>
+const CARDS = [
+  {
+    immagine: "http://localhost:8888/esame_web2/wp-content/uploads/2026/06/808x569_cmsv2_25fbc9df-a40f-509f-b2b7-ff28d1554449-8966684.webp",
+    link:     "http://localhost:8888/esame_web2/index.php/2026/06/27/united-friends/"
+  },
+  {
+    immagine: "http://localhost:8888/esame_web2/wp-content/uploads/2026/06/Think-small.webp",
+    link:     "http://localhost:8888/esame_web2/index.php/2026/06/27/think-small/"
+  },
+  {
+    immagine: "http://localhost:8888/esame_web2/wp-content/uploads/2026/06/Absolut.jpg",
+    link:     "http://localhost:8888/esame_web2/index.php/2026/06/28/absolut-perfection/"
+  },
+    {
+    immagine: "http://localhost:8888/esame_web2/wp-content/uploads/2026/06/Think-Different.png",
+    link:     "http://localhost:8888/esame_web2/index.php/2026/06/28/think-different/"
+  },
+   {
+    immagine: "http://localhost:8888/esame_web2/wp-content/uploads/2026/06/Diamond.webp",
+    link:     "http://localhost:8888/esame_web2/index.php/2026/06/28/a-diamond-is-forever/"
+  }
+];
+</script>
+<div class="scena" id="scena">
+  <div class="stage" id="stage"></div>
+</div>
+
+<script>
+  let corrente = 0;
+  let ultimoScroll = 0;
+
+  const stage = document.getElementById('stage');
+  const scena = document.getElementById('scena');
+
+  const cardEls = CARDS.map((c, i) => {
+    const a = document.createElement('a');
+    a.className = 'card';
+    a.href = c.link;
+
+    const img = document.createElement('img');
+    img.src = c.immagine;
+    a.appendChild(img);
+
+    a.addEventListener('click', (e) => {
+      if (i !== corrente) {
+        e.preventDefault(); 
+        vaiA(i);
+      }
+    });
+
+    stage.appendChild(a);
+    return a;
+  });
+
+  function aggiornaPosizioni() {
+    CARDS.forEach((_, i) => {
+      const distacco = i - corrente;
+      const assoluto = Math.abs(distacco);
+      const tx = distacco * 160; 
+      const scala = assoluto === 0 ? 1 : 0.75; 
+      const opacita = assoluto > 1 ? 0 : 1; 
+      const zIndex = 100 - assoluto; 
+
+      cardEls[i].style.transform = `translateX(${tx}px) scale(${scala})`;
+      cardEls[i].style.opacity = opacita;
+      cardEls[i].style.zIndex = zIndex;
+
+      if (i === corrente) {
+        cardEls[i].style.pointerEvents = 'auto';
+      } else {
+        cardEls[i].style.pointerEvents = 'none';
+      }
+    });
+  }
+
+  function vaiA(i) {
+    corrente = Math.max(0, Math.min(CARDS.length - 1, i));
+    aggiornaPosizioni();
+  }
+
+  aggiornaPosizioni();
+
+  window.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') vaiA(corrente + 1);
+    if (e.key === 'ArrowLeft')  vaiA(corrente - 1);
+  });
+
+  scena.addEventListener('wheel', e => {
+    e.preventDefault();
+    const ora = Date.now();
+    if (ora - ultimoScroll < 400) return; // Ritardo per evitare scorrimenti a raffica
+    ultimoScroll = ora;
+    if (e.deltaY > 0 || e.deltaX > 0) vaiA(corrente + 1);
+    else vaiA(corrente - 1);
+  }, { passive: false });
+</script>
