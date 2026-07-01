@@ -1,70 +1,71 @@
 <div id="custom-preloader">
-  <div id="testo-percentuale">0%</div>
+    <div id="testo-percentuale">0%</div>
 </div>
 
 <style>
-  #custom-preloader {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: #ffe8b5; 
-    z-index: 999999; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: opacity 0.4s ease, visibility 0.4s ease;
-  }
+    #custom-preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #ffe8b5;
+        z-index: 999999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
 
-  #testo-percentuale {
-    color: #08283e;
-    font-family: inherit;
-    font-variant-numeric: tabular-nums;
-    font-size: 1rem; 
-    font-weight: bold;
-  }
+    #testo-percentuale {
+        color: #08283e;
+        font-family: inherit;
+        font-variant-numeric: tabular-nums;
+        font-size: 1rem;
+        font-weight: bold;
+    }
 
-  #custom-preloader.nascondi {
-    opacity: 0;
-    visibility: hidden;
-  }
+    #custom-preloader.nascondi {
+        opacity: 0;
+        visibility: hidden;
+    }
 </style>
 
 <script>
-  if (sessionStorage.getItem('sitoVisitato') === 'true') {
-    document.getElementById('custom-preloader').remove();
-  } else {
-    let avanzamento = 0;
-    let paginaCaricata = false;
-    
-    const elementoTesto = document.getElementById('testo-percentuale');
-    const preloader = document.getElementById('custom-preloader');
+    if (sessionStorage.getItem('sitoVisitato') === 'true') {
+        document.getElementById('custom-preloader').remove();
+    } else {
+        let avanzamento = 0;
+        let paginaCaricata = false;
 
-    const timer = setInterval(() => {
-      avanzamento++;
-      elementoTesto.innerText = avanzamento + '%';
+        const elementoTesto = document.getElementById('testo-percentuale');
+        const preloader = document.getElementById('custom-preloader');
 
-      if (avanzamento >= 100) {
-        clearInterval(timer);
-        if (paginaCaricata) {
-          disattivaPreloader();
+        const timer = setInterval(() => {
+            avanzamento++;
+            elementoTesto.innerText = avanzamento + '%';
+
+            if (avanzamento >= 100) {
+                clearInterval(timer);
+                if (paginaCaricata) {
+                    disattivaPreloader();
+                }
+            }
+        }, 15);
+
+        window.addEventListener('load', () => {
+            paginaCaricata = true;
+            if (avanzamento >= 100) {
+                disattivaPreloader();
+            }
+        });
+
+        function disattivaPreloader() {
+            sessionStorage.setItem('sitoVisitato', 'true');
+            preloader.classList.add('nascondi');
+            setTimeout(() => {
+                preloader.remove();
+            }, 400);
         }
-      }
-    }, 15);
-
-    window.addEventListener('load', () => {
-      paginaCaricata = true;
-      if (avanzamento >= 100) {
-        disattivaPreloader();
-      }
-    });
-
-    function disattivaPreloader() {
-      sessionStorage.setItem('sitoVisitato', 'true');
-      preloader.classList.add('nascondi');
-      setTimeout(() => {
-        preloader.remove();
-      }, 400);
     }
-  }
 </script>
